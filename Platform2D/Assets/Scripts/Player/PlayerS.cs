@@ -33,6 +33,8 @@ public class PlayerS : MonoBehaviour
 
     [SerializeField] private Animator animator;
 
+    [SerializeField] private CameraTargetFollow cameraTarget;
+
 
     private void Awake()
     {
@@ -50,6 +52,10 @@ public class PlayerS : MonoBehaviour
         if (animator == null)
         {
             animator = GetComponent<Animator>();
+        }
+        if (cameraTarget == null)
+        {
+            cameraTarget = FindFirstObjectByType<CameraTargetFollow>();
         }
     }
 
@@ -143,11 +149,21 @@ public class PlayerS : MonoBehaviour
         {
             facingRight = true;
             spriteRenderer.flipX = false;
+            if (cameraTarget != null)
+            {
+                cameraTarget.SetFacingDirection(true);
+            }
+
         }
         else if (moveInput < 0 && facingRight)
         {
             facingRight = false;
             spriteRenderer.flipX = true;
+
+            if (cameraTarget != null)
+            {
+                cameraTarget.SetFacingDirection(false);
+            }
 
         }
     }
