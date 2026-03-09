@@ -1,0 +1,154 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class PlayerS : MonoBehaviour
+{
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+
+    private PlayerControls controls;
+
+    public float MouvmentSpeed = 5.0f;
+    private float moveInput;
+    private bool facingRight = true;
+
+
+    [SerializeField] public float jumpForce = 14f;
+
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius = 0.2f;
+    [SerializeField] private LayerMask groundLayer;
+
+    private bool isGrounded;
+
+    [SerializeField] private float coyoteTime = 0.1f;
+    [SerializeField] private float jumpBufferTime = 0.1f;
+
+    private float coyoteTimer;
+    private float jumpBufferTimer;
+
+    [SerializeField] private float jumpCutMultiplier = 0.5f;
+
+    private bool jumpHeld;
+
+    [SerializeField] private Animator animator;
+
+
+    private void Awake()
+    {
+        controls = new PlayerControls();
+        if (rb == null)
+        {
+            rb = GetComponent<Rigidbody2D>();
+        }
+
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+        }
+    }
+
+    private void OnEnable()
+    {
+        controls.Enable();
+        controls.Player.Jump.performed += OnJump;
+        controls.Player.Jump.canceled += OnJumpCanceled;
+    }
+
+    private void OnDisable()
+    {
+        controls.Player.Jump.performed -= OnJump;
+        controls.Player.Jump.canceled -= OnJumpCanceled;
+        controls.Disable();
+    }
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        Vector2 input = controls.Player.Move.ReadValue<Vector2>();
+        moveInput = input.x;
+
+        HandleFlip();
+
+        animator.SetFloat("Speed", Mathf.Abs(moveInput));
+        animator.SetBool("IsGrounded", isGrounded);
+        animator.SetFloat("YVelocity", rb.linearVelocityY);
+
+        isGrounded = Physics2D.OverlapCircle(
+        groundCheck.position,
+        groundCheckRadius,
+        groundLayer
+        );
+
+        if (isGrounded)
+        {
+            coyoteTimer = coyoteTime;
+        }
+        else
+        {
+            coyoteTimer -= Time.deltaTime;
+        }
+
+        if (jumpBufferTimer > 0)
+        {
+            jumpBufferTimer -= Time.deltaTime;
+        }
+
+    }
+
+    private void FixedUpdate()
+    {
+        rb.linearVelocity = new Vector2(moveInput * MouvmentSpeed, rb.linearVelocityY);
+
+        if (jumpBufferTimer > 0 && coyoteTimer > 0)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+
+            jumpBufferTimer = 0;
+            coyoteTimer = 0;
+        }
+    }
+
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        jumpHeld = true;
+        jumpBufferTimer = jumpBufferTime;
+    }
+
+    private void OnJumpCanceled(InputAction.CallbackContext context)
+    {
+        jumpHeld = false;
+
+        if (rb.linearVelocityY > 0)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocityX, rb.linearVelocityY * jumpCutMultiplier);
+        }
+    }
+
+    private void HandleFlip()
+    {
+        if (moveInput > 0 && !facingRight)
+        {
+            facingRight = true;
+            spriteRenderer.flipX = false;
+        }
+        else if (moveInput < 0 && facingRight)
+        {
+            facingRight = false;
+            spriteRenderer.flipX = true;
+
+        }
+    }
+}
