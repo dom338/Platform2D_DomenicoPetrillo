@@ -5,6 +5,7 @@ public class MainMenuUI : MonoBehaviour
 {
     private string gameSceneName = "Level_1";
     private string CreditsSceneName = "Credits_Scene";
+    private string ManiMenuSceneName = "Main_Menu_Scene";
 
     public void PlayGame()
     {
@@ -20,5 +21,10 @@ public class MainMenuUI : MonoBehaviour
     {
         Debug.Log("exit_game");
         Application.Quit();
+    }
+
+    public void BacktoMenu()
+    {
+        SceneManager.LoadScene(ManiMenuSceneName);
     }
 }
