@@ -6,6 +6,8 @@ public class PlayerS : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer spriteRenderer;
 
+    [SerializeField] private AudioSource PlayerAudio;
+
     private PlayerControls controls;
 
     public float MouvmentSpeed = 5.0f;
@@ -35,6 +37,8 @@ public class PlayerS : MonoBehaviour
 
     [SerializeField] private CameraTargetFollow cameraTarget;
 
+    public AudioClip jumpSound;
+
 
     private void Awake()
     {
@@ -56,6 +60,10 @@ public class PlayerS : MonoBehaviour
         if (cameraTarget == null)
         {
             cameraTarget = FindFirstObjectByType<CameraTargetFollow>();
+        }
+        if (PlayerAudio == null)
+        {
+            PlayerAudio = GetComponent<AudioSource>();
         }
     }
 
@@ -131,6 +139,11 @@ public class PlayerS : MonoBehaviour
     {
         jumpHeld = true;
         jumpBufferTimer = jumpBufferTime;
+        if (jumpSound != null)
+        {
+            PlayerAudio.PlayOneShot(jumpSound);
+        }
+
     }
 
     private void OnJumpCanceled(InputAction.CallbackContext context)
