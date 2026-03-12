@@ -39,6 +39,9 @@ public class PlayerS : MonoBehaviour
 
     public AudioClip jumpSound;
 
+    [SerializeField] private Transform firePoint;
+    private Vector3 firePointLocalPos;
+
 
     private void Awake()
     {
@@ -64,6 +67,10 @@ public class PlayerS : MonoBehaviour
         if (PlayerAudio == null)
         {
             PlayerAudio = GetComponent<AudioSource>();
+        }
+        if (firePoint != null)
+        {
+            firePointLocalPos = firePoint.localPosition;
         }
     }
 
@@ -156,17 +163,28 @@ public class PlayerS : MonoBehaviour
         }
     }
 
+
+
     private void HandleFlip()
     {
         if (moveInput > 0 && !facingRight)
         {
             facingRight = true;
             spriteRenderer.flipX = false;
+
             if (cameraTarget != null)
             {
                 cameraTarget.SetFacingDirection(true);
             }
 
+            if (firePoint != null)
+            {
+                firePoint.localPosition = new Vector3(
+                    Mathf.Abs(firePointLocalPos.x),
+                    firePointLocalPos.y,
+                    firePointLocalPos.z
+                );
+            }
         }
         else if (moveInput < 0 && facingRight)
         {
@@ -178,6 +196,18 @@ public class PlayerS : MonoBehaviour
                 cameraTarget.SetFacingDirection(false);
             }
 
+            if (firePoint != null)
+            {
+                firePoint.localPosition = new Vector3(
+                    -Mathf.Abs(firePointLocalPos.x),
+                    firePointLocalPos.y,
+                    firePointLocalPos.z
+                );
+            }
         }
+    }
+    public bool IsFacingRight()
+    {
+        return facingRight;
     }
 }
