@@ -88,6 +88,19 @@ public class PlayerShootS : MonoBehaviour
     private void UpdateAmmoUI()
     {
         ammoText.text = ammo.ToString();
+        if (ammo > 29)
+        {
+            ammoText.color = Color.white;
+        }
+        if (ammo <= 29 && ammo > 10)
+        {
+            ammoText.color = Color.yellow;
+
+        }
+        if (ammo <= 10)
+        {
+            ammoText.color = Color.red;
+        }
     }
 
     public void AddAmmo(int amount)
