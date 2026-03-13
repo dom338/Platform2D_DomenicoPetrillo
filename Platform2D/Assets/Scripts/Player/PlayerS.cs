@@ -13,6 +13,10 @@ public class PlayerS : MonoBehaviour
     public float MouvmentSpeed = 5.0f;
     private float moveInput;
     private bool facingRight = true;
+    public float maxLife = 100f;
+    public float currentLife = 0;
+    public LifeBarS LifeBar;
+
 
 
     [SerializeField] public float jumpForce = 14f;
@@ -91,6 +95,9 @@ public class PlayerS : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        currentLife = maxLife;
+
+        LifeBar.SetMaxHealth(maxLife);
 
 
     }
@@ -125,6 +132,18 @@ public class PlayerS : MonoBehaviour
         if (jumpBufferTimer > 0)
         {
             jumpBufferTimer -= Time.deltaTime;
+        }
+
+
+        //this code is only for testing
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            TakeDamage(20);
+
+        }
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            Heal(20);
         }
 
     }
@@ -209,5 +228,21 @@ public class PlayerS : MonoBehaviour
     public bool IsFacingRight()
     {
         return facingRight;
+    }
+
+    public void TakeDamage(int Damage)
+    {
+        currentLife -= Damage;
+        LifeBar.SetHealth(currentLife);
+    }
+
+    public void Heal(int Healing)
+    {
+        currentLife += Healing;
+        if (currentLife > maxLife)
+        {
+            currentLife = maxLife;
+        }
+        LifeBar.SetHealth(currentLife);
     }
 }
