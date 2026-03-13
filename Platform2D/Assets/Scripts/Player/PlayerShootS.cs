@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +13,8 @@ public class PlayerShootS : MonoBehaviour
     private PlayerControls controls;
     private float nextFireTime;
     public AudioClip FireSound;
+    public int ammo = 50;
+    public TextMeshProUGUI ammoText;
 
     private void Awake()
     {
@@ -35,30 +38,62 @@ public class PlayerShootS : MonoBehaviour
         controls.Disable();
     }
 
+    private void Start()
+    {
+        UpdateAmmoUI();
+    }
+
     private void OnAttack(InputAction.CallbackContext context)
     {
-        if (Time.time < nextFireTime)
-            return;
-
-        if (firePoint == null || bulletPrefab == null)
+        if (ammo > 0)
         {
-            Debug.LogWarning("FirePoint o BulletPrefab non assegnato nel PlayerWeaponS.");
-            return;
+            if (Time.time < nextFireTime)
+                return;
+
+            if (firePoint == null || bulletPrefab == null)
+            {
+                Debug.LogWarning("FirePoint o BulletPrefab non assegnato nel PlayerWeaponS.");
+                return;
+            }
+
+            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+
+            BasicProjectile bulletScript = bullet.GetComponent<BasicProjectile>();
+            if (bulletScript != null)
+            {
+                float direction = playerS != null && playerS.IsFacingRight() ? 1f : -1f;
+                bulletScript.SetDirection(direction);
+            }
+
+            nextFireTime = Time.time + fireRate;
+            if (FireSound != null)
+            {
+                PlayerAudio.PlayOneShot(FireSound);
+            }
         }
 
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        ammo--;
 
-        BasicProjectile bulletScript = bullet.GetComponent<BasicProjectile>();
-        if (bulletScript != null)
+        if (ammo >= 0)
         {
-            float direction = playerS != null && playerS.IsFacingRight() ? 1f : -1f;
-            bulletScript.SetDirection(direction);
+            UpdateAmmoUI();
+        }
+        else if (ammo < 0)
+        {
+            ammo = 0;
         }
 
-        nextFireTime = Time.time + fireRate;
-        if (FireSound != null)
-        {
-            PlayerAudio.PlayOneShot(FireSound);
-        }
+    }
+
+    private void UpdateAmmoUI()
+    {
+        ammoText.text = ammo.ToString();
+    }
+
+    public void AddAmmo(int amount)
+    {
+        ammo += amount;
+        UpdateAmmoUI();
+
     }
 }
