@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayHoverSound : MonoBehaviour
 {
-    public AudioSource audioSource;
+    private AudioSource audioSource;
     public AudioClip hoverSound;
 
     private void Awake()
@@ -11,6 +11,11 @@ public class PlayHoverSound : MonoBehaviour
     }
     public void PlayHover()
     {
-        audioSource.PlayOneShot(hoverSound);
+        if (audioSource != null)
+        {
+            audioSource.PlayOneShot(hoverSound);
+
+        }
+
     }
 }

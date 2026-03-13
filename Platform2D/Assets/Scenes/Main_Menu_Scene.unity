@@ -529,7 +529,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbac1048c944d25458d9076e93b45e9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioSource: {fileID: 365844141}
   hoverSound: {fileID: 8300000, guid: 9201603c9c1f8b748905dafcd8f40e70, type: 3}
 --- !u!1 &509466860
 GameObject:
