@@ -21999,10 +21999,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4425433895257087101, guid: c82979d9de0ef5545828da45db4edabb, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
     - target: {fileID: 5540830095183641333, guid: c82979d9de0ef5545828da45db4edabb, type: 3}
       propertyPath: m_Name
       value: MovingPlatform
       objectReference: {fileID: 0}
+    - target: {fileID: 7718992346108846716, guid: c82979d9de0ef5545828da45db4edabb, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
     - target: {fileID: 7895933977229611019, guid: c82979d9de0ef5545828da45db4edabb, type: 3}
       propertyPath: m_Layer
       value: 6
