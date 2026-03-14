@@ -40,6 +40,7 @@ public class PlayerS : MonoBehaviour
     private bool jumpHeld;
 
     [SerializeField] private Animator animator;
+    private const string flashRedAmin = "FlashRed";
 
     [SerializeField] private CameraTargetFollow cameraTarget;
 
@@ -236,6 +237,7 @@ public class PlayerS : MonoBehaviour
     public void TakeDamage(int Damage)
     {
         currentLife -= Damage;
+        animator.SetTrigger(flashRedAmin);
         LifeBar.SetHealth(currentLife);
     }
 
