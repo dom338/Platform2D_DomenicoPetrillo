@@ -8,6 +8,8 @@ public class PlayerS : MonoBehaviour
 
     [SerializeField] private AudioSource PlayerAudio;
 
+
+
     private PlayerControls controls;
 
     public float MouvmentSpeed = 5.0f;
@@ -76,6 +78,7 @@ public class PlayerS : MonoBehaviour
         {
             firePointLocalPos = firePoint.localPosition;
         }
+
     }
 
     private void OnEnable()

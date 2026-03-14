@@ -20968,6 +20968,7 @@ MonoBehaviour:
   fireRate: 0.2
   playerS: {fileID: 1747840964}
   PlayerAudio: {fileID: 1747840967}
+  animator: {fileID: 0}
   FireSound: {fileID: 8300000, guid: 90e6172d8e3185345a7780eaef1ba2ab, type: 3}
   ammo: 50
   ammoText: {fileID: 1071135147}

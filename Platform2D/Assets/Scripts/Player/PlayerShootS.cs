@@ -9,6 +9,7 @@ public class PlayerShootS : MonoBehaviour
     [SerializeField] private float fireRate = 0.2f;
     [SerializeField] private PlayerS playerS;
     [SerializeField] private AudioSource PlayerAudio;
+    [SerializeField] private Animator animator;
 
     private PlayerControls controls;
     private float nextFireTime;
@@ -23,6 +24,10 @@ public class PlayerShootS : MonoBehaviour
         if (playerS == null)
         {
             playerS = GetComponent<PlayerS>();
+        }
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
         }
     }
 
@@ -54,6 +59,10 @@ public class PlayerShootS : MonoBehaviour
             {
                 Debug.LogWarning("FirePoint o BulletPrefab non assegnato nel PlayerWeaponS.");
                 return;
+            }
+            if (animator != null)
+            {
+                animator.SetTrigger("Shooting");
             }
 
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
