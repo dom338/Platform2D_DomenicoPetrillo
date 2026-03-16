@@ -12,6 +12,7 @@ public class PlayerS : MonoBehaviour
 
     private PlayerControls controls;
 
+
     public float MouvmentSpeed = 5.0f;
     private float moveInput;
     private bool facingRight = true;
