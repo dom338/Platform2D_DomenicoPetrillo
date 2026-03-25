@@ -8,7 +8,7 @@ public class CameraTargetFollow : MonoBehaviour
     [SerializeField] private bool followX = true;
     [SerializeField] private bool followY = true;
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (player == null) return;
 
