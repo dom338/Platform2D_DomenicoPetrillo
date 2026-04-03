@@ -8,6 +8,8 @@ public class BasicProjectile : MonoBehaviour
     private Rigidbody2D rb;
     private float direction = 1f;
 
+    public float damage = 50;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -30,7 +32,20 @@ public class BasicProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Destroy(gameObject);
+        if (collision.CompareTag("Enemy"))
+        {
+            BaseEnemyAI baseEnemy = collision.GetComponent<BaseEnemyAI>();
+            if (baseEnemy != null)
+            {
+                baseEnemy.TakeDamageE(damage);
+            }
+            Destroy(gameObject);
+        }
+        if (!collision.isTrigger)
+        {
+            Destroy(gameObject);
+        }
+
     }
 }
 
