@@ -68,6 +68,8 @@ public class BaseEnemyAI : MonoBehaviour
         {
             currentState = EnemyState.Patrol;
         }
+
+        HandleAnimations();
     }
 
     void FixedUpdate()
@@ -198,11 +200,11 @@ public class BaseEnemyAI : MonoBehaviour
         if (animator == null)
             return;
 
-        bool isMoving = currentState == EnemyState.Patrol || currentState == EnemyState.Chase;
-        bool isAttacking = currentState == EnemyState.Attack;
+        bool IsMouving = currentState == EnemyState.Patrol || currentState == EnemyState.Chase;
+        bool IsAttacking = currentState == EnemyState.Attack;
 
-        animator.SetBool("IsMoving", isMoving);
-        animator.SetBool("IsAttacking", isAttacking);
+        animator.SetBool("IsMouving", IsMouving);
+        animator.SetBool("IsAttacking", IsAttacking);
     }
     public float TakeDamageE(float damage)
     {
