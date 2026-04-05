@@ -3,25 +3,35 @@ using UnityEngine;
 public class WeaponPickup : MonoBehaviour
 {
     [SerializeField] private WeaponData weaponToGive;
-    [SerializeField] private SpriteRenderer pickupSpriteRenderer;
-    public int ammoToGive = 10;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        if (pickupSpriteRenderer != null && weaponToGive != null)
-        {
-            pickupSpriteRenderer.sprite = weaponToGive.weaponSprite;
-        }
+    [SerializeField] private int ammoToGive = 10;
 
+    private SpriteRenderer spriteRenderer;
+    private AudioSource audioSource;
+
+    public AudioClip pickupSound;
+
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
     }
 
-    private void OTriggerEnter2D(Collider2D collision)
+    private void Start()
     {
-        PlayerShootS Player = collision.GetComponent<PlayerShootS>();
-
-        if (Player != null)
+        if (weaponToGive != null && spriteRenderer != null)
         {
-            Player.PickupWeapon(weaponToGive, ammoToGive);
+            spriteRenderer.sprite = weaponToGive.weaponSprite;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        PlayerShootS player = collision.GetComponent<PlayerShootS>();
+
+        if (player != null)
+        {
+            player.PickupWeapon(weaponToGive, ammoToGive);
+            audioSource.PlayOneShot(pickupSound);
             Destroy(gameObject, 0.2f);
         }
     }

@@ -57,6 +57,11 @@ public class PlayerShootS : MonoBehaviour
         UpdateAmmoUI();
     }
 
+    private void Update()
+    {
+        UpdateWeaponFlip();
+    }
+
     private void OnAttack(InputAction.CallbackContext context)
     {
         if (currentWeapon == null)
@@ -106,19 +111,50 @@ public class PlayerShootS : MonoBehaviour
         {
             animator.SetTrigger("Shooting");
         }
-        GameObject bullet = Instantiate(currentWeapon.bulletPrefab, firePoint.position, quaternion.identity);
 
-        BasicProjectile bulletScript = bullet.GetComponent<BasicProjectile>();
-        if (bulletScript != null)
+        float horizontalDirection = 1f;
+
+        if (playerS != null)
         {
-            float direction = 1f;
-
-            if (playerS != null)
-            {
-                direction = playerS.IsFacingRight() ? 1f : -1f;
-            }
-            bulletScript.SetDirection(direction);
+            horizontalDirection = playerS.IsFacingRight() ? 1f : -1f;
         }
+
+        int projectileCount = Mathf.Max(1, currentWeapon.projectilesPerShot);
+        float spread = currentWeapon.spreadAngle;
+
+        if (projectileCount == 1)
+        {
+            GameObject bulletPrefab = Instantiate(currentWeapon.bulletPrefab, firePoint.position, quaternion.identity);
+
+            BasicProjectile bulletScript = bulletPrefab.GetComponent<BasicProjectile>();
+
+            if (bulletScript != null)
+            {
+                bulletScript.SetDirection(horizontalDirection);
+            }
+        }
+        else
+        {
+            Vector2 baseDirection = horizontalDirection > 0f ? Vector2.right : Vector2.left;
+
+            float startAngle = -spread * 0.5f;
+            float angleStep = spread / (projectileCount - 1);
+
+            for (int i = 0; i < projectileCount; i++)
+            {
+                float angle = startAngle + angleStep * i;
+                Vector2 shotDirection = Quaternion.Euler(0f, 0f, angle) * baseDirection;
+
+                GameObject bullet = Instantiate(currentWeapon.bulletPrefab, firePoint.position, Quaternion.identity);
+
+                BasicProjectile bulletScript = bullet.GetComponent<BasicProjectile>();
+                if (bulletScript != null)
+                {
+                    bulletScript.SetDirection(shotDirection);
+                }
+            }
+        }
+
         if (currentWeapon.fireSound != null && PlayerAudio != null)
         {
             PlayerAudio.PlayOneShot(currentWeapon.fireSound);
@@ -218,6 +254,14 @@ public class PlayerShootS : MonoBehaviour
                 weaponRenderer.enabled = false;
             }
         }
+    }
+
+    private void UpdateWeaponFlip()
+    {
+        if (weaponRenderer == null || playerS == null)
+            return;
+
+        weaponRenderer.flipX = !playerS.IsFacingRight();
     }
 
     private void UpdateAmmoUI()
