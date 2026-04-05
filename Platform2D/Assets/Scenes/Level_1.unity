@@ -21920,6 +21920,10 @@ PrefabInstance:
       propertyPath: ammoText
       value: 
       objectReference: {fileID: 1071135147}
+    - target: {fileID: 3997465715938517913, guid: 35e1df2af79b6d945885381dfae01313, type: 3}
+      propertyPath: baseWeapon
+      value: 
+      objectReference: {fileID: 11400000, guid: a63855c243f829f43aee7e8ca6530dc1, type: 2}
     - target: {fileID: 7955973374396507741, guid: 35e1df2af79b6d945885381dfae01313, type: 3}
       propertyPath: m_LocalPosition.x
       value: -8.59
