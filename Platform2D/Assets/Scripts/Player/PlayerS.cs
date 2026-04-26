@@ -50,6 +50,10 @@ public class PlayerS : MonoBehaviour
     [SerializeField] private Transform firePoint;
     private Vector3 firePointLocalPos;
 
+    [SerializeField] private Transform respawnPoint;
+    [SerializeField] private LevelRespawnManager levelRespawnManager;
+    private bool isDead = false;
+
 
     private void Awake()
     {
@@ -79,6 +83,11 @@ public class PlayerS : MonoBehaviour
         if (firePoint != null)
         {
             firePointLocalPos = firePoint.localPosition;
+        }
+
+        if (levelRespawnManager == null)
+        {
+            levelRespawnManager = FindFirstObjectByType<LevelRespawnManager>();
         }
 
     }
@@ -240,6 +249,10 @@ public class PlayerS : MonoBehaviour
         currentLife -= Damage;
         animator.SetTrigger(flashRedAmin);
         LifeBar.SetHealth(currentLife);
+        if (currentLife <= 0)
+        {
+            PlayerDeath();
+        }
     }
 
     public void Heal(int Healing)
@@ -250,5 +263,30 @@ public class PlayerS : MonoBehaviour
             currentLife = maxLife;
         }
         LifeBar.SetHealth(currentLife);
+    }
+
+    private void PlayerDeath()
+    {
+        if (isDead)
+            return;
+
+        isDead = true;
+
+        rb.linearVelocity = Vector2.zero;
+
+        if (respawnPoint != null)
+        {
+            transform.position = respawnPoint.position;
+        }
+
+        currentLife = maxLife;
+        LifeBar.SetHealth(currentLife);
+
+        if (levelRespawnManager != null)
+        {
+            levelRespawnManager.RespawnEnemies();
+        }
+
+        isDead = false;
     }
 }

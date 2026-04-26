@@ -42,6 +42,15 @@ public class BaseEnemyAI : MonoBehaviour
         animator = GetComponent<Animator>();
         startingPosition = transform.position;
         currentState = EnemyState.Patrol;
+        if (playerTarget == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+            if (player != null)
+            {
+                playerTarget = player.transform;
+            }
+        }
 
     }
 
