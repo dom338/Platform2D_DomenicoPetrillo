@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0ea3fccbc65a4e41afe3e22b87cf4b4, type: 3}
+  m_Name: RocketLauncher
+  m_EditorClassIdentifier: 
+  weaponName: RocketLauncher
+  bulletPrefab: {fileID: 877787275998218969, guid: 6d89fbdcdd94b2141938eb4ba32f9e94, type: 3}
+  fireRate: 1.2
+  fireSound: {fileID: 8300000, guid: e7c5064e39d5af3469bcc5441f7b533b, type: 3}
+  weaponSprite: {fileID: 21300000, guid: 67dc7307ccafef648b6dec0c19553621, type: 3}
+  projectilesPerShot: 1
+  spreadAngle: 0

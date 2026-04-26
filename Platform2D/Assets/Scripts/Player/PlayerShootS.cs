@@ -1,5 +1,4 @@
 using TMPro;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -124,14 +123,11 @@ public class PlayerShootS : MonoBehaviour
 
         if (projectileCount == 1)
         {
-            GameObject bulletPrefab = Instantiate(currentWeapon.bulletPrefab, firePoint.position, quaternion.identity);
-
-            BasicProjectile bulletScript = bulletPrefab.GetComponent<BasicProjectile>();
-
-            if (bulletScript != null)
-            {
-                bulletScript.SetDirection(horizontalDirection);
-            }
+            Vector3 spawnPosition = firePoint.position + new Vector3(horizontalDirection * 0.5f, 0f, 0f);
+            GameObject bullet = Instantiate(currentWeapon.bulletPrefab, firePoint.position, Quaternion.identity);
+            SetProjectileDirection(bullet, horizontalDirection);
+            IgnorePlayerCollision(bullet);
+            Debug.Log("Ho istanziato: " + bullet.name);
         }
         else
         {
@@ -159,7 +155,35 @@ public class PlayerShootS : MonoBehaviour
         {
             PlayerAudio.PlayOneShot(currentWeapon.fireSound);
         }
+    }
+    private void IgnorePlayerCollision(GameObject projectile)
+    {
+        Collider2D projectileCollider = projectile.GetComponent<Collider2D>();
+        Collider2D[] playerColliders = GetComponentsInChildren<Collider2D>();
 
+        if (projectileCollider == null)
+            return;
+
+        foreach (Collider2D playerCollider in playerColliders)
+        {
+            Physics2D.IgnoreCollision(projectileCollider, playerCollider);
+        }
+    }
+
+    private void SetProjectileDirection(GameObject projectile, float horizontalDirection)
+    {
+        BasicProjectile basicProjectile = projectile.GetComponent<BasicProjectile>();
+        if (basicProjectile != null)
+        {
+            basicProjectile.SetDirection(horizontalDirection);
+            return;
+        }
+
+        RocketProjectile rocketProjectile = projectile.GetComponent<RocketProjectile>();
+        if (rocketProjectile != null)
+        {
+            rocketProjectile.SetDirection(horizontalDirection);
+        }
     }
 
     private void DecreaseAmmo()
