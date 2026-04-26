@@ -6,7 +6,7 @@ public class BasicProjectile : MonoBehaviour
     [SerializeField] private float lifeTime = 3f;
 
     private Rigidbody2D rb;
-    private float direction = 1f;
+    private Vector2 moveDirection = Vector2.right;
 
     public float damage = 50;
 
@@ -17,16 +17,37 @@ public class BasicProjectile : MonoBehaviour
 
     private void Start()
     {
-        rb.linearVelocity = new Vector2(direction * speed, 0f);
+        rb.linearVelocity = moveDirection * speed;
         Destroy(gameObject, lifeTime);
     }
 
     public void SetDirection(float newDirection)
     {
-        direction = newDirection;
+        if (newDirection >= 0)
+        {
+            moveDirection = Vector2.right;
+        }
+        else
+        {
+            moveDirection = Vector2.left;
+        }
+        UpdateVisualDirection();
+    }
 
+    public void SetDirection(Vector2 newDirection)
+    {
+        moveDirection = newDirection.normalized;
+        UpdateVisualDirection();
+    }
+
+    private void UpdateVisualDirection()
+    {
         Vector3 scale = transform.localScale;
-        scale.x = Mathf.Abs(scale.x) * Mathf.Sign(direction);
+
+        if (moveDirection.x != 0f)
+        {
+            scale.x = Mathf.Abs(scale.x) * Mathf.Sign(moveDirection.x);
+        }
         transform.localScale = scale;
     }
 

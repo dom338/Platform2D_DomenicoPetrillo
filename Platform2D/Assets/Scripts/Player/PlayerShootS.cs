@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,12 +11,18 @@ public class PlayerShootS : MonoBehaviour
     [SerializeField] private PlayerS playerS;
     [SerializeField] private AudioSource PlayerAudio;
     [SerializeField] private Animator animator;
+    [SerializeField] private SpriteRenderer weaponRenderer;
+    [SerializeField] private WeaponData baseWeapon;
+
 
     private PlayerControls controls;
     private float nextFireTime;
     public AudioClip FireSound;
     public int ammo = 50;
     public TextMeshProUGUI ammoText;
+    private WeaponData currentWeapon;
+    private WeaponData secondaryWeapon;
+    private int secondaryAmmo = 0;
 
     private void Awake()
     {
@@ -45,77 +52,254 @@ public class PlayerShootS : MonoBehaviour
 
     private void Start()
     {
+        currentWeapon = baseWeapon;
+        UpdateWeaponSprite();
         UpdateAmmoUI();
+    }
+
+    private void Update()
+    {
+        UpdateWeaponFlip();
     }
 
     private void OnAttack(InputAction.CallbackContext context)
     {
-        if (ammo > 0)
+        if (currentWeapon == null)
         {
-            if (Time.time < nextFireTime)
-                return;
-
-            if (firePoint == null || bulletPrefab == null)
-            {
-                Debug.LogWarning("FirePoint o BulletPrefab non assegnato nel PlayerWeaponS.");
-                return;
-            }
-            if (animator != null)
-            {
-                animator.SetTrigger("Shooting");
-            }
-
-            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-
-            BasicProjectile bulletScript = bullet.GetComponent<BasicProjectile>();
-            if (bulletScript != null)
-            {
-                float direction = playerS != null && playerS.IsFacingRight() ? 1f : -1f;
-                bulletScript.SetDirection(direction);
-            }
-
-            nextFireTime = Time.time + fireRate;
-            if (FireSound != null)
-            {
-                PlayerAudio.PlayOneShot(FireSound);
-            }
+            return;
         }
+        if (Time.time < nextFireTime)
+        {
+            return;
+        }
+        ammo = GetCurrentAmmo();
 
-        ammo--;
+        if (ammo <= 0)
+        {
+            HandleEmptyWeapon();
+            return;
+        }
+        if (firePoint == null)
+        {
+            Debug.Log("firePoint equal null");
+            return;
+        }
+        if (currentWeapon.bulletPrefab == null)
+        {
+            Debug.Log("bulletPrefab equal null");
+            return;
+        }
+        Shoot();
+        DecreaseAmmo();
 
-        if (ammo >= 0)
+        nextFireTime = Time.time + currentWeapon.fireRate;
+
+        if (GetCurrentAmmo() <= 0)
+        {
+            HandleEmptyWeapon();
+        }
+        else
         {
             UpdateAmmoUI();
-        }
-        else if (ammo < 0)
-        {
-            ammo = 0;
         }
 
     }
 
+    private void Shoot()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger("Shooting");
+        }
+
+        float horizontalDirection = 1f;
+
+        if (playerS != null)
+        {
+            horizontalDirection = playerS.IsFacingRight() ? 1f : -1f;
+        }
+
+        int projectileCount = Mathf.Max(1, currentWeapon.projectilesPerShot);
+        float spread = currentWeapon.spreadAngle;
+
+        if (projectileCount == 1)
+        {
+            GameObject bulletPrefab = Instantiate(currentWeapon.bulletPrefab, firePoint.position, quaternion.identity);
+
+            BasicProjectile bulletScript = bulletPrefab.GetComponent<BasicProjectile>();
+
+            if (bulletScript != null)
+            {
+                bulletScript.SetDirection(horizontalDirection);
+            }
+        }
+        else
+        {
+            Vector2 baseDirection = horizontalDirection > 0f ? Vector2.right : Vector2.left;
+
+            float startAngle = -spread * 0.5f;
+            float angleStep = spread / (projectileCount - 1);
+
+            for (int i = 0; i < projectileCount; i++)
+            {
+                float angle = startAngle + angleStep * i;
+                Vector2 shotDirection = Quaternion.Euler(0f, 0f, angle) * baseDirection;
+
+                GameObject bullet = Instantiate(currentWeapon.bulletPrefab, firePoint.position, Quaternion.identity);
+
+                BasicProjectile bulletScript = bullet.GetComponent<BasicProjectile>();
+                if (bulletScript != null)
+                {
+                    bulletScript.SetDirection(shotDirection);
+                }
+            }
+        }
+
+        if (currentWeapon.fireSound != null && PlayerAudio != null)
+        {
+            PlayerAudio.PlayOneShot(currentWeapon.fireSound);
+        }
+
+    }
+
+    private void DecreaseAmmo()
+    {
+        if (currentWeapon == baseWeapon)
+        {
+            ammo--;
+            if (ammo < 0)
+            {
+                ammo = 0;
+            }
+        }
+        else
+        {
+            secondaryAmmo--;
+            if (secondaryAmmo < 0)
+            {
+                secondaryAmmo = 0;
+            }
+        }
+    }
+
+    private int GetCurrentAmmo()
+    {
+        if (currentWeapon == baseWeapon)
+        {
+            return ammo;
+        }
+        return secondaryAmmo;
+    }
+
+    private void HandleEmptyWeapon()
+    {
+        if (currentWeapon != null && currentWeapon != baseWeapon)
+        {
+            secondaryWeapon = null;
+            secondaryAmmo = 0;
+            currentWeapon = baseWeapon;
+
+            UpdateWeaponSprite();
+            UpdateAmmoUI();
+            return;
+        }
+        UpdateAmmoUI();
+    }
+
+    public void PickupWeapon(WeaponData newWeapon, int ammoAmount)
+    {
+        if (newWeapon == null)
+        {
+            return;
+        }
+
+        secondaryWeapon = newWeapon;
+        secondaryAmmo = ammoAmount;
+
+        if (secondaryAmmo < 0)
+        {
+            secondaryAmmo = 0;
+        }
+        currentWeapon = secondaryWeapon;
+        UpdateWeaponSprite();
+        UpdateAmmoUI();
+    }
+
+    public WeaponData GetCurrentWeapon()
+    {
+        return currentWeapon;
+    }
+    public WeaponData GetBaseWeapon()
+    {
+        return baseWeapon;
+    }
+
+    public bool HasSecondaryWeapon()
+    {
+        return secondaryWeapon != null;
+    }
+
+    private void UpdateWeaponSprite()
+    {
+        if (weaponRenderer != null)
+        {
+            if (currentWeapon != null)
+            {
+                weaponRenderer.sprite = currentWeapon.weaponSprite;
+                weaponRenderer.enabled = currentWeapon.weaponSprite != null;
+            }
+            else
+            {
+                weaponRenderer.sprite = null;
+                weaponRenderer.enabled = false;
+            }
+        }
+    }
+
+    private void UpdateWeaponFlip()
+    {
+        if (weaponRenderer == null || playerS == null)
+            return;
+
+        weaponRenderer.flipX = !playerS.IsFacingRight();
+    }
+
     private void UpdateAmmoUI()
     {
-        ammoText.text = ammo.ToString();
-        if (ammo > 29)
+        ammo = GetCurrentAmmo();
+        if (ammoText != null)
         {
-            ammoText.color = Color.white;
-        }
-        if (ammo <= 29 && ammo > 10)
-        {
-            ammoText.color = Color.yellow;
+            ammoText.text = ammo.ToString();
 
-        }
-        if (ammo <= 10)
-        {
-            ammoText.color = Color.red;
+            if (ammo > 29)
+            {
+                ammoText.color = Color.white;
+            }
+            else if (ammo > 10)
+            {
+                ammoText.color = Color.yellow;
+            }
+            else
+            {
+                ammoText.color = Color.red;
+            }
+
         }
     }
 
     public void AddAmmo(int amount)
     {
-        ammo += amount;
-        UpdateAmmoUI();
+        if (amount <= 0)
+        {
+            return;
+        }
 
+        ammo += amount;
+
+        if (secondaryWeapon != null)
+        {
+            secondaryAmmo += amount;
+        }
+        UpdateAmmoUI();
     }
 }
